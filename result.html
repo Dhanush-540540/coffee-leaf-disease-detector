@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Coffee Leaf Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .user-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info h3 {
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            color: #718096;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results {
+            margin-top: 25px;
+        }
+
+        .confidence-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #68d391);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .confidence-text {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .prediction-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .disease-info {
+            background: #e8f4fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .severity-high { border-left-color: #f56565; background: #fed7d7; }
+        .severity-medium { border-left-color: #ed8936; background: #feebc8; }
+        .severity-low { border-left-color: #48bb78; background: #c6f6d5; }
+        .severity-none { border-left-color: #a0aec0; background: #edf2f7; }
+
+        .metrics-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .preview-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .notification-status {
+            background: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-section {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- User Info Section -->
+        <div class="user-section">
+            <div class="user-info">
+                <h3>Welcome, {{ username }}! 👋</h3>
+                <p>Analysis Results - Coffee Leaf Disease Detection</p>
+            </div>
+            <a href="{{ url_for('dashboard') }}" class="back-btn">🔙 Back to Dashboard</a>
+        </div>
+
+        <div class="header">
+            <h1>📊 Analysis Results</h1>
+            <p>Complete disease detection report with treatment recommendations</p>
+        </div>
+
+        <!-- Display results -->
+        <div class="card">
+            <div id="resultsContent">
+                {% if error %}
+                    <div class="prediction-item severity-high">
+                        <h3>❌ Error Processing Image</h3>
+                        <p>{{ error }}</p>
+                    </div>
+                {% else %}
+                    <!-- Notification Status -->
+                    <div class="notification-status">
+                        <h4>📧 Notifications Sent Successfully</h4>
+                        <p>✅ Detailed report sent to your email address</p>
+                        {% if notifications and notifications.sms and notifications.sms.sent %}
+                            <p>✅ SMS alert sent to your registered phone number</p>
+                        {% endif %}
+                        <p><small>Check your email for comprehensive treatment recommendations and pesticide details.</small></p>
+                    </div>
+
+                    {% if not predictions or predictions|length == 0 %}
+                        <div class="prediction-item severity-none">
+                            <h3>✅ No Disease Spots Detected</h3>
+                            <p>The coffee leaf appears healthy with no visible disease spots.</p>
+                            {% if image_with_boxes %}
+                                <div class="preview-container">
+                                    <h3>Analyzed Image:</h3>
+                                    <img src="data:image/jpeg;base64,{{ image_with_boxes }}" class="preview-image">
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <h3>🎯 Disease Spots Detected & Marked</h3>
+                        
+                        <!-- Detection Metrics -->
+                        {% if metrics %}
+                        <div class="metrics-panel">
+                            <div class="metrics-grid">
+                                <div class="metric-card">
+                                    <div class="metric-label">Disease Spots Found</div>
+                                    <div class="metric-value">{{ metrics.spots_found }}</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Diseases Identified</div>
+                                    <div class="metric-value">{{ metrics.diseases_identified }}</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Leaf Status</div>
+                                    <div class="metric-value">{{ metrics.leaf_status.upper() }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Marked Image with Bounding Boxes -->
+                        {% if image_with_boxes %}
+                        <div class="preview-container">
+                            <h3>🔍 Marked Disease Spots:</h3>
+                            <p><small>Colored boxes show detected disease areas</small></p>
+                            <img src="data:image/jpeg;base64,{{ image_with_boxes }}" class="preview-image" style="border: 3px solid #667eea;">
+                            <div style="margin-top: 15px; text-align: center;">
+                                <div style="display: inline-flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="width: 20px; height: 3px; background: #4CAF50;"></div>
+                                        <span>Healthy</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="width: 20px; height: 3px; background: #f44336;"></div>
+                                        <span>Rust</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="width: 20px; height: 3px; background: #FF9800;"></div>
+                                        <span>Leaf Miner</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <div style="width: 20px; height: 3px; background: #FF5722;"></div>
+                                        <span>Phoma</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Detailed Disease Information with Treatments -->
+                        <div style="margin-top: 30px;">
+                            <h3>💊 Disease Treatment & Management</h3>
+                        </div>
+
+                        {% for disease_class, disease_predictions in grouped_predictions.items() %}
+                            {% set first_pred = disease_predictions[0] %}
+                            {% set severity_class = 'severity-' + (first_pred.disease_info.severity|lower if first_pred.disease_info.severity else 'medium') %}
+                            {% set avg_confidence = (disease_predictions|sum(attribute='confidence') / disease_predictions|length) * 100 %}
+                            
+                            <div class="prediction-item {{ severity_class }}">
+                                <h3>{{ get_disease_emoji(disease_class) }} {{ first_pred.disease_info.name }}</h3>
+                                <p><strong>Spots Detected:</strong> {{ disease_predictions|length }} areas | <strong>Average Confidence:</strong> {{ avg_confidence|round|int }}%</p>
+                                <p><strong>Description:</strong> {{ first_pred.disease_info.description }}</p>
+                                
+                                <div class="disease-info">
+                                    <h4>🛡️ Recommended Pesticides & Treatments:</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 10px;">
+                                        {% if first_pred.disease_info.pesticides and first_pred.disease_info.pesticides|length > 0 %}
+                                            {% for pesticide in first_pred.disease_info.pesticides %}
+                                                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                                                    <strong>{{ pesticide.name }}</strong><br>
+                                                    <small>Type: {{ pesticide.type }} | Dosage: {{ pesticide.dosage }}</small><br>
+                                                    <small>Frequency: {{ pesticide.frequency }}</small>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                                                <strong>No pesticides needed</strong><br>
+                                                <small>Maintain good agricultural practices and regular monitoring</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div style="margin-top: 15px;">
+                                        <h4>📋 Application Method:</h4>
+                                        <p>{{ first_pred.disease_info.application_method or first_pred.disease_info.treatment or 'Follow recommended agricultural practices' }}</p>
+                                    </div>
+                                    
+                                    <div style="margin-top: 15px;">
+                                        <h4>🌱 Preventive Measures:</h4>
+                                        <ul style="margin-left: 20px;">
+                                            {% if first_pred.disease_info.preventive_measures and first_pred.disease_info.preventive_measures|length > 0 %}
+                                                {% for measure in first_pred.disease_info.preventive_measures %}
+                                                    <li>{{ measure }}</li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <li>Regular monitoring and inspection</li>
+                                                <li>Maintain proper plant spacing</li>
+                                                <li>Ensure good air circulation</li>
+                                                <li>Practice proper sanitation</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px; background: rgba(255,193,7,0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #FFC107;">
+                                    <h4>⚠️ Important Notes:</h4>
+                                    <ul style="margin-left: 20px;">
+                                        <li>Always wear protective equipment when applying pesticides</li>
+                                        <li>Follow recommended waiting periods before harvest</li>
+                                        <li>Rotate pesticides to prevent resistance</li>
+                                        <li>Consult local agricultural experts for specific recommendations</li>
+                                        <!-- <li>Test on small area before full application</li> -->
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <!-- General Agricultural Advice -->
+                        <div class="prediction-item" style="background: #e3f2fd; border-left: 4px solid #2196F3;">
+                            <h3>🌿 General Coffee Plant Care Recommendations</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                                <div>
+                                    <h4>💧 Water Management</h4>
+                                    <ul style="margin-left: 20px;">
+                                        <li>Maintain consistent soil moisture</li>
+                                        <li>Avoid waterlogging and drought stress</li>
+                                        <li>Use drip irrigation for efficiency</li>
+                                        <!-- <li>Water early in the morning</li> -->
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4>🌱 Nutrient Management</h4>
+                                    <ul style="margin-left: 20px;">
+                                        <li>Conduct regular soil testing</li>
+                                        <li>Apply balanced NPK fertilizers</li>
+                                        <!-- <li>Incorporate organic matter</li> -->
+                                        <li>Use micronutrients as needed</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4>✂️ Pruning & Maintenance</h4>
+                                    <ul style="margin-left: 20px;">
+                                        <li>Regular pruning for air circulation</li>
+                                        <li>Remove diseased and dead plant parts</li>
+                                        <li>Maintain proper shade levels</li>
+                                        <!-- <li>Weed control around plants</li> -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{{ url_for('dashboard') }}" class="btn">🔄 New Analysis</a>
+                <a href="{{ url_for('history') }}" class="btn btn-secondary">📋 View History</a>
+                {% if image_with_boxes %}
+                    <button class="btn btn-success" onclick="downloadReport()">📥 Download Report</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Download report functionality
+        function downloadReport() {
+            alert('Report download feature would be implemented here!');
+            // In a real implementation, this would generate and download a PDF report
+        }
+
+        // Print functionality
+        function printReport() {
+            window.print();
+        }
+
+        // Share functionality
+        function shareReport() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Coffee Leaf Disease Analysis Report',
+                    text: 'Check out my coffee leaf disease analysis results',
+                    url: window.location.href
+                });
+            } else {
+                alert('Web Share API not supported in your browser');
+            }
+        }
+    </script>
+</body>
+</html>

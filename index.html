@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Leaf Disease Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+            background:url("https://i.ibb.co/Fq6T0mhq/organic-coffee-beans-still-life.jpg") no-repeat center center/cover;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            padding: 4rem 0 3rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 4rem 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .hero-content h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            color: #2d5016;
+            background: linear-gradient(135deg, #2d5016, #4a7c2a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            color: #666;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            margin: 0 15px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a7c2a, #3a641a);
+            color: white;
+            box-shadow: 0 5px 15px rgba(74, 124, 42, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 124, 42, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4a7c2a, #3a641a);;
+            color: white;
+            border: 0 5px 15px rgba(74, 124, 42, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 124, 42, 0.6);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: #2d5016;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            background: white;
+            padding: 5rem 0;
+            border-radius: 20px;
+            margin: 3rem 0;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            color: #2d5016;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step h3 {
+            color: #2d5016;
+            margin-bottom: 1rem;
+        }
+
+        /* Disease Info Section */
+        .diseases {
+            padding: 5rem 0;
+            color: white;
+        }
+
+        .diseases h2 {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .disease-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .disease-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .disease-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .disease-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .disease-card.severity-high { border-left: 5px solid #f44336; }
+        .disease-card.severity-medium { border-left: 5px solid #FF9800; }
+        .disease-card.severity-low { border-left: 5px solid #4CAF50; }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: white;
+            border-top: 2px solid rgba(249, 243, 243, 0.2);
+            margin-top: 3rem;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+            font-weight: bold;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                display: block;
+                margin: 10px auto;
+                width: 80%;
+                max-width: 300px;
+            }
+            
+            .feature-grid,
+            .steps,
+            .disease-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-section {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .features h2,
+            .how-it-works h2,
+            .diseases h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header fade-in">
+            <h1>☕ Coffee Leaf Disease Detection </h1>
+            <p>AI-Powered Solution for Healthy Coffee Plants</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Get Started</a>
+                <a href="#features" class="btn btn-secondary">Learn More</a>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section fade-in">
+            <div class="hero-content">
+                <h2>Protect Your Coffee Harvest with AI</h2>
+                <p>Our advanced machine learning system detects coffee leaf diseases early, providing instant diagnosis and treatment recommendations to save your crops.</p>
+                <div class="hero-stats">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem;">
+                        <div>
+                            <h3 style="color: #4a7c2a; font-size: 2.5rem;">99%</h3>
+                            <p>Detection Accuracy</p>
+                        </div>
+                        <div>
+                            <h3 style="color: #4a7c2a; font-size: 2.5rem;">15s</h3>
+                            <p>Analysis Time</p>
+                        </div>
+                        <div>
+                            <h3 style="color: #4a7c2a; font-size: 2.5rem;">24/7</h3>
+                            <p>Available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <h2>Why Choose Our System?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Accurate Detection</h3>
+                    <p>Advanced YOLOv8 AI model identifies multiple coffee leaf diseases with over 99% accuracy</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Real-time Analysis</h3>
+                    <p>Get instant results with our optimized detection system - analyze images in seconds</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3>Multi-Platform</h3>
+                    <p>Upload images, use live camera - flexible options for every need</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📧</span>
+                    <h3>Smart Notifications</h3>
+                    <p>Receive detailed treatment reports via email alerts with pesticide recommendations</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🌱</span>
+                    <h3>Expert Guidance</h3>
+                    <p>Get professional treatment plans and preventive measures for each detected disease</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is protected with secure user accounts and encrypted communications</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Create Account</h3>
+                    <p>Sign up for free and set up your profile with email and phone for notifications</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Upload Image</h3>
+                    <p>Take a photo of coffee leaves or upload existing images from your device</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>AI Analysis</h3>
+                    <p>Our system analyzes the image and marks disease spots with bounding boxes</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Get Results</h3>
+                    <p>Receive detailed report with treatment recommendations via email</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diseases Section -->
+        <section class="diseases">
+            <h2>Common Coffee Leaf Diseases We Detect</h2>
+            <div class="disease-grid">
+                <div class="disease-card severity-high">
+                    <h3>☕ Coffee Leaf Rust</h3>
+                    <p>Orange-yellow powdery spots caused by fungus Hemileia vastatrix</p>
+                    <p><strong>Severity:</strong> High</p>
+                </div>
+                <div class="disease-card severity-medium">
+                    <h3>🐛 Leaf Miner</h3>
+                    <p>Winding trails or mines created by larvae tunneling through leaves</p>
+                    <p><strong>Severity:</strong> Medium</p>
+                </div>
+                <div class="disease-card severity-medium">
+                    <h3>🟤 Phoma Leaf Spot</h3>
+                    <p>Irregular brown spots that may cause leaf drop</p>
+                    <p><strong>Severity:</strong> Medium</p>
+                </div>
+                <div class="disease-card severity-low">
+                    <h3>✅ Healthy Leaves</h3>
+                    <p>No disease detected - your plants are in good condition</p>
+                    <p><strong>Severity:</strong> None</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Ready to Protect Your Coffee Plants?</h2>
+            <p>Join thousands of farmers using our AI system to maintain healthy crops</p>
+            <a href="{{ url_for('login') }}" class="btn btn-primary" style="font-size: 1.2rem; padding: 18px 40px;">
+                Start Detecting Now
+            </a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
+                Free account • No credit card required • Instant results
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <!-- <a href="#how-it-works">How It Works</a> -->
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            </div>
+            <p>&copy; 2025 Coffee Leaf Disease Detection System. All rights reserved.</p>
+            <div class="footer-links">
+                <a style="margin-top: 2rem;">AGRO TECH - Built with ❤️ for coffee farmers worldwide</a>
+
+            </div>
+            <!-- <div class="footer-links">
+                <a>AGRO TECH</a>
+            </div> -->
+            <!-- <p style="margin-top: 1rem; opacity: 0.7;">
+                AGRO TECH
+            </p>
+            <p style="margin-top: 0rem; opacity: 0.7;">
+                Built with ❤️ for coffee farmers worldwide
+            </p> -->
+        </footer>
+    </div>
+
+    <script>
+        // Simple fade-in animation for elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.feature-card, .step, .disease-card').forEach((el) => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
